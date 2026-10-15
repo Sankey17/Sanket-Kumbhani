@@ -1,0 +1,586 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sanket Kumbhani</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Sanket Kumbhani, Shopify app and backend developer in Surat, India. Shopify Functions, Admin GraphQL API, Node.js, TypeScript.">
+<meta property="og:title" content="Sanket Kumbhani · Shopify App Developer">
+<meta property="og:description" content="Shopify apps on Node.js, TypeScript and GraphQL. Nearly 5 years in web development, 4.5 on Shopify.">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#0D1015">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230D1015'/%3E%3Ctext x='50%25' y='56%25' text-anchor='middle' dominant-baseline='middle' font-family='Arial,sans-serif' font-weight='800' font-size='30' fill='%23FF6A3D'%3ESK%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one narrow column of reading, a wide hero split (statement | live GraphQL console), work as metric-led rows, experience as a dated timeline. Dark-first. */
+:root{
+  --bg:#0D1015; --surface:#141921; --surface-2:#1A202A; --line:#252D39;
+  --fg:#E9EDF3; --muted:#8C96A8; --faint:#5C6677;
+  --accent:#FF6A3D; --accent-ink:#1A0B05;
+  --cyan:#5BD6E8; --lilac:#B9A0FF; --mint:#6EE2A8;
+  --display:"Bricolage Grotesque", "Arial Narrow", system-ui, sans-serif;
+  --body:"Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono:"JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --maxw:1160px;
+  color-scheme:dark;
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){
+    --bg:#F3F5F8; --surface:#FFFFFF; --surface-2:#EBEFF4; --line:#D9DFE8;
+    --fg:#10141B; --muted:#566072; --faint:#8A93A3;
+    --accent:#E0491A; --accent-ink:#FFFFFF;
+    --cyan:#0B8497; --lilac:#6A4ED3; --mint:#13875A;
+    color-scheme:light;
+  }
+}
+:root[data-theme="light"]{
+  --bg:#F3F5F8; --surface:#FFFFFF; --surface-2:#EBEFF4; --line:#D9DFE8;
+  --fg:#10141B; --muted:#566072; --faint:#8A93A3;
+  --accent:#E0491A; --accent-ink:#FFFFFF;
+  --cyan:#0B8497; --lilac:#6A4ED3; --mint:#13875A;
+  color-scheme:light;
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--body);font-size:1.0625rem;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:inherit}
+::selection{background:var(--accent);color:var(--accent-ink)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:4px}
+h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance;letter-spacing:-.02em}
+p{margin:0}
+
+.wrap{max-width:var(--maxw);margin-inline:auto;padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px))}
+@media (min-width:720px){.wrap{padding-left:max(32px, env(safe-area-inset-left, 0px));padding-right:max(32px, env(safe-area-inset-right, 0px))}}
+
+/* ---------- top bar ---------- */
+.bar{position:sticky;top:env(safe-area-inset-top, 0px);z-index:20;background:color-mix(in oklab, var(--bg) 82%, transparent);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid transparent;transition:border-color .3s}
+.bar.scrolled{border-bottom-color:var(--line)}
+.bar .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;height:64px}
+.mark{font-family:var(--display);font-weight:800;font-size:1.15rem;text-decoration:none;letter-spacing:-.03em;display:flex;align-items:center;gap:10px}
+.mark i{width:9px;height:9px;border-radius:50%;background:var(--mint);box-shadow:0 0 0 4px color-mix(in oklab, var(--mint) 22%, transparent);font-style:normal}
+.nav{display:flex;align-items:center;gap:4px}
+.nav a{font-size:.9rem;color:var(--muted);text-decoration:none;padding:8px 12px;border-radius:999px;transition:color .2s, background .2s}
+.nav a:hover{color:var(--fg);background:var(--surface-2)}
+.theme-btn{width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:transparent;color:var(--fg);display:grid;place-items:center;cursor:pointer;margin-left:6px;transition:border-color .2s}
+.theme-btn:hover{border-color:var(--muted)}
+.theme-btn svg{width:17px;height:17px}
+@media (max-width:640px){.nav a.hide-sm{display:none}}
+
+/* ---------- hero ---------- */
+.hero{padding-block:clamp(48px,8vw,96px) clamp(40px,6vw,72px)}
+.hero-grid{display:grid;gap:clamp(36px,5vw,64px);grid-template-columns:1fr}
+@media (min-width:980px){.hero-grid{grid-template-columns:1.05fr .95fr;align-items:center}}
+.hero-copy{min-width:0}
+.eyebrow{font-family:var(--mono);font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:flex;flex-wrap:wrap;gap:8px 18px}
+.eyebrow b{color:var(--fg);font-weight:500}
+.hero h1{font-size:clamp(2.7rem,7.2vw,5.6rem);line-height:.95;font-weight:800;letter-spacing:-.045em;margin-top:22px;font-variation-settings:"opsz" 96}
+.hero h1 .hl{color:var(--accent)}
+.hero h1 .thin{font-weight:400;color:var(--muted)}
+.lede{margin-top:26px;max-width:56ch;color:var(--muted);font-size:clamp(1.02rem,1.4vw,1.15rem)}
+.lede strong{color:var(--fg);font-weight:600}
+.cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:32px}
+.btn{display:inline-flex;align-items:center;gap:10px;padding:13px 20px;border-radius:999px;font-weight:600;font-size:.95rem;text-decoration:none;border:1px solid var(--line);transition:transform .2s, background .2s, border-color .2s}
+.btn:hover{transform:translateY(-2px);border-color:var(--muted)}
+.cta .btn{min-width:172px;height:52px;justify-content:center;padding-block:0}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.primary:hover{border-color:var(--accent)}
+.btn svg{width:16px;height:16px}
+
+/* load stagger: starts visible-in-layout, only moves; no hidden resting state */
+@media (prefers-reduced-motion:no-preference){
+  .rise{animation:rise .8s cubic-bezier(.2,.7,.2,1) both}
+  .rise.d1{animation-delay:.06s}.rise.d2{animation-delay:.14s}.rise.d3{animation-delay:.22s}.rise.d4{animation-delay:.32s}
+  @keyframes rise{from{transform:translateY(14px);opacity:.001}to{transform:none;opacity:1}}
+}
+
+/* ---------- console ---------- */
+.console{min-width:0;background:var(--surface);border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:0 30px 80px -40px color-mix(in oklab, var(--accent) 35%, transparent)}
+.c-head{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid var(--line);font-family:var(--mono);font-size:.75rem;color:var(--muted)}
+.c-head .dots{display:flex;gap:6px}.c-head .dots span{width:10px;height:10px;border-radius:50%;background:var(--line)}
+.c-head .ep{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.c-tabs{display:flex;gap:6px;padding:10px 12px;border-bottom:1px solid var(--line);overflow-x:auto;scrollbar-width:none}
+.c-tabs::-webkit-scrollbar{display:none}
+.c-tab{font-family:var(--mono);font-size:.78rem;padding:7px 12px;border-radius:8px;border:1px solid transparent;background:transparent;color:var(--muted);cursor:pointer;white-space:nowrap;transition:background .2s,color .2s,border-color .2s}
+.c-tab:hover{color:var(--fg)}
+.c-tab[aria-selected="true"]{background:var(--surface-2);color:var(--fg);border-color:var(--line)}
+.c-body{display:grid;grid-template-columns:1fr}
+.c-pane{min-width:0;padding:16px 18px;font-family:var(--mono);font-size:.8rem;line-height:1.65;overflow-x:auto}
+.c-pane pre{margin:0;white-space:pre}
+.c-pane + .c-pane{border-top:1px solid var(--line)}
+.c-pane + .c-pane{background:color-mix(in oklab, var(--surface-2) 45%, transparent)}
+.c-label{font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin-bottom:8px;display:flex;justify-content:space-between;gap:8px}
+.c-label .ok{color:var(--mint)}
+.c-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:10px 14px;border-top:1px solid var(--line);font-family:var(--mono);font-size:.72rem;color:var(--muted)}
+.bucket{display:flex;align-items:center;gap:8px}
+.bucket .meter{width:90px;height:5px;border-radius:9px;background:var(--surface-2);overflow:hidden}
+.bucket .meter i{display:block;height:100%;background:var(--mint);border-radius:9px;transition:width .6s cubic-bezier(.2,.7,.2,1)}
+.run{font-family:var(--mono);font-size:.72rem;display:inline-flex;align-items:center;gap:6px;background:transparent;border:1px solid var(--line);color:var(--fg);padding:5px 10px;border-radius:7px;cursor:pointer}
+.run:hover{border-color:var(--accent);color:var(--accent)}
+.k{color:var(--accent)} .f{color:var(--cyan)} .s{color:var(--lilac)} .n{color:var(--mint)} .p{color:var(--faint)}
+#res.flash{animation:flash .5s ease}
+@keyframes flash{from{opacity:.25}to{opacity:1}}
+@media (prefers-reduced-motion:reduce){#res.flash{animation:none}}
+
+/* ---------- numbers ---------- */
+.figures{border-block:1px solid var(--line)}
+.figures .wrap{display:grid;grid-template-columns:repeat(2,1fr)}
+@media (min-width:820px){.figures .wrap{grid-template-columns:repeat(4,1fr)}}
+.fig{padding:26px 0;min-width:0}
+.fig + .fig{padding-left:clamp(16px,3vw,32px)}
+@media (max-width:819px){.fig:nth-child(3){padding-left:0}.fig:nth-child(n+3){border-top:1px solid var(--line)}}
+@media (min-width:820px){.fig + .fig{border-left:1px solid var(--line)}}
+@media (max-width:819px){.fig:nth-child(2n){border-left:1px solid var(--line)}}
+.fig b{display:block;font-family:var(--display);font-weight:700;font-size:clamp(2rem,4vw,2.9rem);line-height:1;letter-spacing:-.04em;font-variant-numeric:tabular-nums}
+.fig b sup{font-size:.5em;color:var(--accent);vertical-align:.7em;margin-left:2px}
+.fig span{display:block;margin-top:8px;font-size:.88rem;color:var(--muted);max-width:22ch}
+
+/* ---------- sections ---------- */
+section.block{padding-block:clamp(64px,9vw,120px)}
+.sec-head{display:grid;gap:14px;margin-bottom:clamp(36px,5vw,56px)}
+@media (min-width:900px){.sec-head{grid-template-columns:260px 1fr;align-items:end}}
+.sec-tag{font-family:var(--mono);font-size:.78rem;color:var(--accent);letter-spacing:.04em}
+.sec-head h2{font-size:clamp(2rem,4.6vw,3.4rem);line-height:1;font-weight:700}
+.sec-head p{grid-column:1/-1;color:var(--muted);max-width:60ch}
+@media (min-width:900px){.sec-head p{grid-column:2}}
+
+/* ---------- now (current role) ---------- */
+.now{display:grid;gap:clamp(24px,4vw,48px);grid-template-columns:1fr;background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:clamp(24px,4vw,44px);position:relative;overflow:hidden}
+@media (min-width:900px){.now{grid-template-columns:1fr 1fr}}
+.now::before{content:"";position:absolute;inset:auto -10% -60% auto;width:420px;height:420px;border-radius:50%;background:radial-gradient(circle, color-mix(in oklab, var(--accent) 22%, transparent), transparent 65%);pointer-events:none}
+.now > *{position:relative;min-width:0}
+.pill{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:.74rem;padding:5px 11px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
+.pill i{width:7px;height:7px;border-radius:50%;background:var(--mint);font-style:normal}
+.now h3{font-size:clamp(1.7rem,3.2vw,2.4rem);line-height:1.05;margin-top:18px;font-weight:700}
+.now h3 em{font-style:normal;color:var(--accent)}
+.now .meta{margin-top:10px;color:var(--muted);font-size:.95rem}
+.now .desc{margin-top:18px;color:var(--muted);max-width:52ch}
+.ships{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.ships li{display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:start;padding:16px 18px;border-radius:14px;background:var(--bg);border:1px solid var(--line)}
+.ships li code{font-family:var(--mono);font-size:.72rem;color:var(--cyan);padding-top:3px;white-space:nowrap}
+.ships li span{font-size:.97rem}
+
+/* ---------- work rows ---------- */
+.work{display:grid;gap:0;border-top:1px solid var(--line)}
+.row{display:grid;gap:18px;padding-block:clamp(28px,4vw,44px);border-bottom:1px solid var(--line);grid-template-columns:1fr;transition:background .3s}
+@media (min-width:900px){.row{grid-template-columns:260px 1fr 220px;gap:32px;align-items:start}}
+.row > *{min-width:0}
+.row .ctx{font-family:var(--mono);font-size:.76rem;color:var(--muted);display:grid;gap:4px;align-content:start}
+.row .ctx b{color:var(--fg);font-weight:500}
+.row h3{font-size:clamp(1.5rem,2.8vw,2.1rem);line-height:1.05;font-weight:700;transition:color .25s}
+.row:hover h3{color:var(--accent)}
+.row .body p{margin-top:12px;color:var(--muted);max-width:60ch}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:16px}
+.chips span{font-family:var(--mono);font-size:.72rem;padding:4px 10px;border-radius:7px;background:var(--surface-2);color:var(--fg);border:1px solid var(--line)}
+.metric{display:grid;gap:4px;align-content:start}
+@media (min-width:900px){.metric{text-align:right}}
+.metric b{font-family:var(--display);font-weight:700;font-size:clamp(2.2rem,4vw,3rem);line-height:1;letter-spacing:-.04em;color:var(--fg);font-variant-numeric:tabular-nums}
+.metric b small{font-size:.5em;color:var(--accent);margin-left:2px}
+.metric span{font-size:.85rem;color:var(--muted)}
+.metric.badge b{font-size:1rem;font-family:var(--mono);font-weight:500;letter-spacing:0;display:inline-flex;gap:8px;align-items:center;justify-content:flex-start}
+@media (min-width:900px){.metric.badge b{justify-content:flex-end}}
+.metric.badge b i{width:8px;height:8px;border-radius:50%;background:var(--mint)}
+
+/* ---------- timeline ---------- */
+.tl{list-style:none;margin:0;padding:0;display:grid;gap:0}
+.tl li{display:grid;grid-template-columns:1fr;gap:10px;padding-block:28px;border-top:1px solid var(--line);position:relative}
+@media (min-width:900px){.tl li{grid-template-columns:260px 1fr;gap:32px}}
+.tl li > *{min-width:0}
+.tl .when{font-family:var(--mono);font-size:.8rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.tl .when b{display:block;color:var(--fg);font-weight:500;margin-bottom:2px}
+.tl h3{font-size:1.4rem;font-weight:700;line-height:1.15}
+.tl h3 span{color:var(--muted);font-weight:500;font-family:var(--body);font-size:1rem;letter-spacing:0}
+.tl ul{margin:12px 0 0;padding:0;list-style:none;display:grid;gap:8px;color:var(--muted);max-width:68ch}
+.tl ul li{display:block;padding:0 0 0 18px;border:0;position:relative}
+.tl ul li::before{content:"";position:absolute;left:0;top:.72em;width:7px;height:1.5px;background:var(--accent)}
+.tl ul li strong{color:var(--fg);font-weight:600}
+.tl .current .when b::after{content:"now";margin-left:8px;font-size:.66rem;padding:2px 7px;border-radius:999px;background:color-mix(in oklab, var(--mint) 18%, transparent);color:var(--mint);vertical-align:1px}
+
+/* ---------- stack ---------- */
+.stack{display:grid;gap:14px;grid-template-columns:1fr}
+@media (min-width:700px){.stack{grid-template-columns:repeat(2,1fr)}}
+@media (min-width:1040px){.stack{grid-template-columns:repeat(3,1fr)}}
+.grp{padding:24px;border-radius:18px;border:1px solid var(--line);background:var(--surface);min-width:0;transition:border-color .25s, transform .25s}
+.grp:hover{border-color:color-mix(in oklab, var(--accent) 55%, var(--line));transform:translateY(-2px)}
+.grp.lead{background:linear-gradient(160deg, color-mix(in oklab, var(--accent) 14%, var(--surface)), var(--surface) 60%)}
+@media (min-width:1040px){.grp.lead{grid-row:span 2}}
+.grp h3{font-size:1.15rem;font-weight:700;display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.grp h3 code{font-family:var(--mono);font-size:.7rem;font-weight:400;color:var(--faint)}
+.grp p{margin-top:8px;color:var(--muted);font-size:.93rem}
+.grp .chips{margin-top:16px}
+
+/* ---------- edu ---------- */
+.edu{display:grid;gap:14px;grid-template-columns:1fr;margin-top:clamp(40px,5vw,56px)}
+@media (min-width:800px){.edu{grid-template-columns:1fr 1fr}}
+.edu div{padding:22px 24px;border-radius:16px;border:1px dashed var(--line);min-width:0}
+.edu small{font-family:var(--mono);font-size:.72rem;color:var(--faint);text-transform:uppercase;letter-spacing:.08em}
+.edu p{margin-top:8px;font-weight:600}
+.edu span{display:block;margin-top:4px;color:var(--muted);font-size:.92rem}
+
+/* ---------- contact ---------- */
+.contact{padding-block:clamp(72px,10vw,140px) clamp(40px,6vw,64px);border-top:1px solid var(--line)}
+.contact h2{font-size:clamp(2.6rem,8vw,6.4rem);line-height:.92;font-weight:800;letter-spacing:-.05em;max-width:14ch}
+.contact h2 span{color:var(--accent)}
+.c-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:36px;align-items:center}
+.mailbox{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:999px;padding:6px 6px 6px 20px;background:var(--surface);max-width:100%}
+.mailbox span{font-family:var(--mono);font-size:clamp(.82rem,2.6vw,1rem);user-select:all;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.copy{border:0;background:var(--accent);color:var(--accent-ink);font-weight:600;font-family:var(--body);font-size:.88rem;padding:10px 16px;border-radius:999px;cursor:pointer;white-space:nowrap}
+.copy:hover{filter:brightness(1.08)}
+footer{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-top:clamp(64px,8vw,100px);padding-top:22px;border-top:1px solid var(--line);font-family:var(--mono);font-size:.74rem;color:var(--faint)}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<header class="bar" id="bar">
+  <div class="wrap">
+    <a class="mark" href="#top" aria-label="Sanket Kumbhani, back to top"><i></i>sanket.k</a>
+    <nav class="nav" aria-label="Sections">
+      <a href="#work">Work</a>
+      <a href="#experience" class="hide-sm">Experience</a>
+      <a href="#stack" class="hide-sm">Stack</a>
+      <a href="#contact">Contact</a>
+      <button class="theme-btn" id="themeBtn" type="button" aria-label="Switch colour theme">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+      </button>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div class="hero-copy">
+        <div class="eyebrow rise"><b>Sanket Kumbhani</b><span>Surat, India</span><span>Shopify App &amp; Backend Developer</span></div>
+        <h1 class="rise d1">Shopify apps,<br><span class="thin">built from the</span> <span class="hl">API&nbsp;up.</span></h1>
+        <p class="lede rise d2">Nearly five years in web development, four and a half of them on Shopify. I write apps on <strong>Node.js, TypeScript and GraphQL</strong>: Shopify Functions, sales channel integrations, admin tools in Polaris, and the backend work that holds them together. Right now that's <strong>VegaCart</strong>, a mobile app builder at Crawlapps.</p>
+        <div class="cta rise d3">
+          <a class="btn primary" href="#work">See the work
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12l7 7 7-7"/></svg></a>
+          <a class="btn" href="https://www.linkedin.com/in/sanket-kumbhani-6574b2276" target="_blank" rel="noopener">LinkedIn
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a>
+        </div>
+      </div>
+
+      <div class="console rise d4" aria-label="Interactive GraphQL console about Sanket">
+        <div class="c-head">
+          <div class="dots" aria-hidden="true"><span></span><span></span><span></span></div>
+          <span class="ep">POST /admin/api/graphql.json</span>
+        </div>
+        <div class="c-tabs" role="tablist" id="tabs">
+          <button class="c-tab" role="tab" aria-selected="true" data-q="profile" id="tab-profile">profile</button>
+          <button class="c-tab" role="tab" aria-selected="false" data-q="currentRole" id="tab-role">currentRole</button>
+          <button class="c-tab" role="tab" aria-selected="false" data-q="track" id="tab-track">trackRecord</button>
+          <button class="c-tab" role="tab" aria-selected="false" data-q="stack" id="tab-stack">stack</button>
+        </div>
+        <div class="c-body">
+          <div class="c-pane"><div class="c-label"><span>Query</span></div><pre id="qry"></pre></div>
+          <div class="c-pane"><div class="c-label"><span>Response</span><span class="ok">200 OK</span></div><pre id="res"></pre></div>
+        </div>
+        <div class="c-foot">
+          <div class="bucket" title="Shopify Admin API leaky-bucket throttle">
+            <span id="cost">cost 0</span>
+            <div class="meter" aria-hidden="true"><i id="meter" style="width:100%"></i></div>
+            <span id="avail">1000/1000</span>
+          </div>
+          <button class="run" id="runBtn" type="button">&#9654; Run</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="figures" aria-label="Key numbers">
+    <div class="wrap">
+      <div class="fig"><b>4.5<sup>yrs</sup></b><span>building on Shopify, of ~5 in web development</span></div>
+      <div class="fig"><b>5<sup>+</sup></b><span>custom Shopify apps architected and shipped</span></div>
+      <div class="fig"><b>50<sup>+</sup></b><span>merchant stores running those apps</span></div>
+      <div class="fig"><b>10k<sup>+</sup></b><span>OTP transactions a day through Authyo</span></div>
+    </div>
+  </div>
+
+  <section class="block" id="now">
+    <div class="wrap">
+      <div class="now">
+        <div>
+          <span class="pill"><i></i>Oct 2025 · present</span>
+          <h3>Turning Shopify stores into <em>native apps</em> at Crawlapps.</h3>
+          <p class="meta">Shopify App Developer · VegaCart Mobile App Builder</p>
+          <p class="desc">VegaCart converts a Shopify store into a Flutter-based native app. My side of it is the Shopify-integrated features, real-time store data sync, and keeping the backend scalable as merchant workflows get more involved.</p>
+        </div>
+        <ul class="ships" aria-label="What I've shipped at Crawlapps">
+          <li><code>functions</code><span>Shopify Functions with custom discount logic for complex merchant requirements</span></li>
+          <li><code>backend</code><span>Reworked the app architecture on Node.js, TypeScript and GraphQL so it's easier to scale and maintain</span></li>
+          <li><code>channels</code><span>Sales channel integrations and backend improvements that merchants actually feel</span></li>
+          <li><code>integrations</code><span>Reusable integrations and tighter API workflows, so features behave consistently</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="work" style="padding-top:0">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="sec-tag">// selected work</span>
+        <h2>Things I've built that merchants use.</h2>
+      </div>
+
+      <div class="work">
+        <article class="row">
+          <div class="ctx"><b>Authyo</b><span>OTP Login &amp; Register</span><span>Shopify app</span></div>
+          <div class="body">
+            <h3>Passwordless login for Shopify storefronts</h3>
+            <p>Email and SMS one-time passwords on a custom Node.js backend. Real-time input validation and clear error handling pushed registration completion up by 25%.</p>
+            <div class="chips"><span>Node.js</span><span>Shopify App</span><span>Email OTP</span><span>SMS OTP</span></div>
+          </div>
+          <div class="metric"><b>10,000<small>+</small></b><span>OTP transactions per day</span></div>
+        </article>
+
+        <article class="row">
+          <div class="ctx"><b>Rootways Wishlist</b><span>for Rootways Inc., Canada</span><span>Shopify App Store</span></div>
+          <div class="body">
+            <h3>Wishlist and save-for-later, live on the App Store</h3>
+            <p>Guest and customer wishlists, multiple shareable lists, theme integration, and automated reminder emails sent through Brevo.</p>
+            <div class="chips"><span>Shopify App</span><span>Theme integration</span><span>Brevo</span><span>Node.js</span></div>
+          </div>
+          <div class="metric badge"><b><i></i>Live</b><span>public listing on the Shopify App Store</span></div>
+        </article>
+
+        <article class="row">
+          <div class="ctx"><b>Mobile App Build System</b><span>Flutter merchant apps</span><span>Polaris admin</span></div>
+          <div class="body">
+            <h3>One admin screen to configure a Flutter build</h3>
+            <p>A Polaris admin for setting up Flutter merchant apps. Node.js and Express generate the pubspec automatically, so nobody hand-edits build config per merchant.</p>
+            <div class="chips"><span>Polaris</span><span>Node.js</span><span>Express</span><span>Flutter</span></div>
+          </div>
+          <div class="metric"><b>~70<small>%</small></b><span>less setup time per app</span></div>
+        </article>
+
+        <article class="row">
+          <div class="ctx"><b>RavelCare.com</b><span>Theme work</span><span>at Codify Infotech</span></div>
+          <div class="body">
+            <h3>A guided product quiz that sells the next item</h3>
+            <p>Built the quiz into the theme, plus "Random Products on Refresh" and "Browser History" features. Theme performance work in Liquid, JavaScript and React cut bounce rate by 15%.</p>
+            <div class="chips"><span>Liquid</span><span>JavaScript</span><span>React</span><span>Online Store 2.0</span></div>
+          </div>
+          <div class="metric"><b>+22<small>%</small></b><span>upsells from the quiz · return visits up 18%</span></div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="experience" style="padding-top:0">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="sec-tag">// experience</span>
+        <h2>From themes to apps to the backend.</h2>
+      </div>
+      <ol class="tl">
+        <li class="current">
+          <div class="when"><b>Oct 2025 – Present</b>Surat, India</div>
+          <div>
+            <h3>Crawlapps <span>· Shopify App Developer</span></h3>
+            <ul>
+              <li>Develop and extend the <strong>VegaCart Mobile App Builder</strong>, which converts Shopify stores into Flutter-based native apps.</li>
+              <li>Implemented <strong>Shopify Functions</strong>, including custom discount logic.</li>
+              <li>Improved the app architecture with Node.js, TypeScript and GraphQL.</li>
+              <li>Contributed to sales channel integrations and backend enhancements.</li>
+            </ul>
+          </div>
+        </li>
+        <li>
+          <div class="when"><b>Aug 2023 – Sep 2025</b>Ahmedabad, India</div>
+          <div>
+            <h3>XillenTech <span>· Shopify App &amp; Theme Developer, MERN Stack</span></h3>
+            <ul>
+              <li>Architected and deployed <strong>5+ custom Shopify apps</strong> used across <strong>50+ merchant stores</strong>.</li>
+              <li>Worked on <strong>MobiVogue</strong>, a public Shopify app that turns merchant stores into mobile apps.</li>
+              <li>Integrated the Admin API, GraphQL and App Bridge for in-admin store management tools.</li>
+            </ul>
+          </div>
+        </li>
+        <li>
+          <div class="when"><b>Jun 2022 – Jul 2023</b>Surat, India</div>
+          <div>
+            <h3>Codify Infotech <span>· Shopify Theme Developer</span></h3>
+            <ul>
+              <li>Built a guided product quiz for RavelCare.com that <strong>increased upsells by 22%</strong>.</li>
+              <li>Shipped "Random Products on Refresh" and "Browser History" features; return visits up 18%.</li>
+              <li>Optimised themes with Liquid, JavaScript and React; bounce rate down 15%.</li>
+            </ul>
+          </div>
+        </li>
+        <li>
+          <div class="when"><b>Jan 2022 – Apr 2022</b>Ahmedabad, India</div>
+          <div>
+            <h3>Code Quality Technologies LLP <span>· ReactJS Developer</span></h3>
+            <ul>
+              <li>Built responsive React apps with reusable components and hooks, including a weather app on real-time API data.</li>
+            </ul>
+          </div>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="block" id="stack" style="padding-top:0">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="sec-tag">// stack</span>
+        <h2>What I reach for.</h2>
+      </div>
+      <div class="stack">
+        <div class="grp lead">
+          <h3>Shopify platform <code>primary</code></h3>
+          <p>Where most of my hours go. Apps, extensions, and the APIs underneath them.</p>
+          <div class="chips"><span>Shopify Functions</span><span>Admin API · GraphQL</span><span>Admin API · REST</span><span>Sales channels</span><span>App Bridge</span><span>Polaris</span><span>App extensions</span><span>Shopify CLI</span><span>Online Store 2.0</span><span>Liquid</span></div>
+        </div>
+        <div class="grp">
+          <h3>Backend &amp; APIs</h3>
+          <p>REST and GraphQL API design, reusable third-party integrations.</p>
+          <div class="chips"><span>Node.js</span><span>TypeScript</span><span>Express.js</span><span>GraphQL</span><span>MongoDB</span><span>MySQL</span></div>
+        </div>
+        <div class="grp">
+          <h3>Frontend</h3>
+          <p>Admin UIs and storefront features.</p>
+          <div class="chips"><span>React</span><span>Next.js</span><span>JavaScript</span><span>Tailwind CSS</span><span>Polaris</span></div>
+        </div>
+        <div class="grp">
+          <h3>Mobile app builders</h3>
+          <p>The pipeline that turns a store into a Flutter app.</p>
+          <div class="chips"><span>Flutter build config</span><span>pubspec generation</span><span>Real-time store sync</span></div>
+        </div>
+        <div class="grp">
+          <h3>Deploy &amp; tooling</h3>
+          <p>Getting it to production and keeping it there.</p>
+          <div class="chips"><span>Docker</span><span>CI/CD</span><span>DigitalOcean</span><span>Git</span><span>GitHub</span></div>
+        </div>
+      </div>
+
+      <div class="edu">
+        <div><small>Education</small><p>B.Sc. Computer Applications &amp; Information Technology</p><span>K. S. School of Business Management, Gujarat University · 2019–2022</span></div>
+        <div><small>Certifications · Anthropic · Mar 2026</small><p>Claude Code in Action</p><span>AI Fluency: Framework &amp; Foundations</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="contact" id="contact">
+    <div class="wrap">
+      <span class="sec-tag">// contact</span>
+      <h2 style="margin-top:18px">Got a Shopify app to build? <span>Let's talk.</span></h2>
+      <div class="c-actions">
+        <div class="mailbox"><span id="mail">sanketkumbhani0@gmail.com</span><button class="copy" id="copyBtn" type="button">Copy email</button></div>
+        <a class="btn" href="https://www.linkedin.com/in/sanket-kumbhani-6574b2276" target="_blank" rel="noopener">LinkedIn
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a>
+      </div>
+      <footer>
+        <span>© <span id="yr">2026</span> Sanket Kumbhani</span>
+        <span>Surat, Gujarat, India</span>
+      </footer>
+    </div>
+  </section>
+</main>
+
+<script>
+(function(){
+  /* ---------- theme toggle ---------- */
+  var root=document.documentElement, btn=document.getElementById('themeBtn');
+  try{var saved=localStorage.getItem('sk-theme'); if(saved==='light'||saved==='dark') root.setAttribute('data-theme',saved);}catch(e){}
+  function current(){var t=root.getAttribute('data-theme'); if(t) return t; return matchMedia('(prefers-color-scheme: light)').matches?'light':'dark';}
+  btn.addEventListener('click',function(){
+    var next=current()==='dark'?'light':'dark';
+    root.setAttribute('data-theme',next);
+    try{localStorage.setItem('sk-theme',next);}catch(e){}
+  });
+
+  /* ---------- sticky bar border ---------- */
+  var bar=document.getElementById('bar');
+  function onScroll(){bar.classList.toggle('scrolled',window.scrollY>8);}
+  window.addEventListener('scroll',onScroll,{passive:true}); onScroll();
+
+  /* ---------- GraphQL console ---------- */
+  var Q={
+    profile:{
+      q:['query {','  developer(handle: "sanket") {','    name','    role','    location','    yearsInWebDev','    yearsOnShopify','  }','}'],
+      r:{data:{developer:{name:"Sanket Kumbhani",role:"Shopify App & Backend Developer",location:"Surat, Gujarat, IN",yearsInWebDev:5,yearsOnShopify:4.5}}}
+    },
+    currentRole:{
+      q:['query {','  developer(handle: "sanket") {','    currentRole {','      company','      title','      product','      since','      shipped','    }','  }','}'],
+      r:{data:{developer:{currentRole:{company:"Crawlapps",title:"Shopify App Developer",product:"VegaCart Mobile App Builder",since:"2025-10",shipped:["Shopify Functions","Sales channel integrations","Node.js + TS backend"]}}}}
+    },
+    track:{
+      q:['query {','  developer(handle: "sanket") {','    trackRecord {','      customApps','      merchantStores','      otpPerDay','      quizUpsellLift','    }','  }','}'],
+      r:{data:{developer:{trackRecord:{customApps:"5+",merchantStores:"50+",otpPerDay:"10,000+",quizUpsellLift:"22%"}}}}
+    },
+    stack:{
+      q:['query {','  developer(handle: "sanket") {','    stack(first: 3) {','      backend','      shopify','      frontend','    }','  }','}'],
+      r:{data:{developer:{stack:{backend:["Node.js","TypeScript","GraphQL"],shopify:["Functions","Admin API","Polaris"],frontend:["React","Next.js","Tailwind"]}}}}
+    }
+  };
+  var MAX=1000, avail=MAX, RESTORE=50, active='profile';
+  var qEl=document.getElementById('qry'), rEl=document.getElementById('res');
+  var costEl=document.getElementById('cost'), availEl=document.getElementById('avail'), meter=document.getElementById('meter');
+
+  function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+  function hlQuery(lines){
+    return lines.map(function(l){
+      var e=esc(l);
+      e=e.replace(/"([^"]*)"/g,'<span class="s">"$1"</span>');
+      e=e.replace(/^(\s*)(query)/,'$1<span class="k">$2</span>');
+      e=e.replace(/\b(handle|first)(:)/g,'<span class="p">$1$2</span>');
+      e=e.replace(/(\d+)(\))/g,'<span class="n">$1</span>$2');
+      e=e.replace(/^(\s+)([a-zA-Z]+)(?=\s*(\(|\{|$))/,'$1<span class="f">$2</span>');
+      return e;
+    }).join('\n');
+  }
+  function hlJSON(obj,ind){
+    ind=ind||0; var pad='  '.repeat(ind+1), end='  '.repeat(ind);
+    if(Array.isArray(obj)){
+      return '['+obj.map(function(v){return '<span class="s">"'+esc(v)+'"</span>';}).join(', ')+']';
+    }
+    if(obj&&typeof obj==='object'){
+      var keys=Object.keys(obj);
+      return '{\n'+keys.map(function(k,i){
+        return pad+'<span class="f">"'+k+'"</span>: '+hlJSON(obj[k],ind+1)+(i<keys.length-1?',':'');
+      }).join('\n')+'\n'+end+'}';
+    }
+    if(typeof obj==='number') return '<span class="n">'+obj+'</span>';
+    return '<span class="s">"'+esc(obj)+'"</span>';
+  }
+  function countFields(o){var c=0; if(o&&typeof o==='object'&&!Array.isArray(o)){Object.keys(o).forEach(function(k){c+=1+countFields(o[k]);});} return c;}
+  function render(key,run){
+    var item=Q[key], cost=countFields(item.r.data);
+    qEl.innerHTML=hlQuery(item.q);
+    if(run){avail=Math.max(0,avail-cost);}
+    rEl.innerHTML=hlJSON(item.r);
+    rEl.classList.remove('flash'); void rEl.offsetWidth; rEl.classList.add('flash');
+    costEl.textContent='cost '+cost;
+    availEl.textContent=avail+'/'+MAX;
+    meter.style.width=(avail/MAX*100)+'%';
+  }
+  var tabs=[].slice.call(document.querySelectorAll('.c-tab'));
+  tabs.forEach(function(t){
+    t.addEventListener('click',function(){
+      tabs.forEach(function(x){x.setAttribute('aria-selected',x===t?'true':'false');});
+      active=t.dataset.q; render(active,true);
+    });
+  });
+  document.getElementById('runBtn').addEventListener('click',function(){render(active,true);});
+  setInterval(function(){ if(avail<MAX){avail=Math.min(MAX,avail+RESTORE); availEl.textContent=avail+'/'+MAX; meter.style.width=(avail/MAX*100)+'%';} },1000);
+  render('profile',false);
+
+  /* ---------- copy email ---------- */
+  var copyBtn=document.getElementById('copyBtn'), mail=document.getElementById('mail');
+  copyBtn.addEventListener('click',function(){
+    var done=function(){copyBtn.textContent='Copied'; setTimeout(function(){copyBtn.textContent='Copy email';},1800);};
+    var fallback=function(){var r=document.createRange(); r.selectNodeContents(mail); var s=getSelection(); s.removeAllRanges(); s.addRange(r); copyBtn.textContent='Selected, press Ctrl+C';};
+    try{ navigator.clipboard.writeText(mail.textContent).then(done,fallback); }catch(e){ fallback(); }
+  });
+
+  document.getElementById('yr').textContent=new Date().getFullYear();
+})();
+</script>
+</body>
+</html>
