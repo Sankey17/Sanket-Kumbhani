@@ -25,6 +25,11 @@
   --body:"Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
   --mono:"JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
   --maxw:1160px;
+  --glass:color-mix(in oklab, var(--surface) 50%, transparent);
+  --glass-strong:color-mix(in oklab, var(--surface) 78%, transparent);
+  --glass-edge:color-mix(in oklab, var(--fg) 13%, transparent);
+  --glass-hi:color-mix(in oklab, var(--fg) 9%, transparent);
+  --aura-opacity:.95;
   color-scheme:dark;
 }
 @media (prefers-color-scheme: light){
@@ -33,6 +38,7 @@
     --fg:#10141B; --muted:#566072; --faint:#8A93A3;
     --accent:#E0491A; --accent-ink:#FFFFFF;
     --mint:#13875A; --danger:#D42A4C;
+    --aura-opacity:.6;
     color-scheme:light;
   }
 }
@@ -41,6 +47,7 @@
   --fg:#10141B; --muted:#566072; --faint:#8A93A3;
   --accent:#E0491A; --accent-ink:#FFFFFF;
   --mint:#13875A; --danger:#D42A4C;
+  --aura-opacity:.6;
   color-scheme:light;
 }
 
@@ -80,7 +87,8 @@ button{font:inherit;color:inherit}
 .intro h1 span{color:var(--accent)}
 .intro .lede{margin-top:24px;max-width:60ch;color:var(--muted);font-size:clamp(1.02rem,1.4vw,1.15rem)}
 .toc{display:grid;gap:10px;margin-top:36px;grid-template-columns:repeat(auto-fill,minmax(200px,1fr))}
-.toc a{display:grid;gap:6px;align-content:start;padding:16px 18px;border-radius:14px;border:1px solid var(--line);background:var(--surface);text-decoration:none;transition:border-color .2s,transform .2s}
+.toc a{display:grid;gap:6px;align-content:start;padding:16px 18px;border-radius:14px;border:1px solid var(--glass-edge);background:var(--glass);
+  -webkit-backdrop-filter:blur(16px) saturate(150%);backdrop-filter:blur(16px) saturate(150%);box-shadow:inset 0 1px 0 var(--glass-hi);text-decoration:none;transition:border-color .2s,transform .2s}
 .toc a:hover{border-color:var(--accent);transform:translateY(-2px)}
 .toc small{font-family:var(--mono);font-size:.7rem;color:var(--accent)}
 .toc span{font-weight:600;line-height:1.3}
@@ -99,22 +107,25 @@ button{font:inherit;color:inherit}
 .sys-head h2{font-size:clamp(1.8rem,4vw,2.8rem);line-height:1.02;font-weight:700}
 .sys-head p{color:var(--muted)}
 
-.viz{border:1px solid var(--line);border-radius:20px;background:var(--surface);overflow:hidden}
+.viz{position:relative;border:1px solid var(--glass-edge);border-radius:22px;overflow:hidden;
+  background:linear-gradient(155deg, var(--glass-hi), transparent 38%), var(--glass);
+  -webkit-backdrop-filter:blur(24px) saturate(160%);backdrop-filter:blur(24px) saturate(160%);
+  box-shadow:inset 0 1px 0 var(--glass-hi), 0 40px 90px -50px rgba(0,0,0,.55)}
 
 /* stage: HTML nodes on a grid, svg edges behind */
 .stage{position:relative;display:grid;column-gap:clamp(56px,7vw,96px);row-gap:64px;padding:clamp(40px,5vw,56px) clamp(20px,4vw,48px);
-  background-image:radial-gradient(circle, color-mix(in oklab, var(--line) 90%, transparent) 1px, transparent 1.4px);background-size:22px 22px}
+  background-image:radial-gradient(circle, color-mix(in oklab, var(--fg) 10%, transparent) 1px, transparent 1.4px);background-size:22px 22px}
 .stage svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none;z-index:0}
 .node{position:relative;z-index:1;justify-self:center;align-self:center;width:100%;max-width:230px;min-width:0;text-align:left;
-  display:grid;gap:3px;padding:12px 14px;border-radius:12px;border:1.5px solid var(--line);background:var(--surface);cursor:pointer;
+  display:grid;gap:3px;padding:12px 14px;border-radius:12px;border:1px solid var(--glass-edge);background:var(--glass-strong);box-shadow:inset 0 1px 0 var(--glass-hi);cursor:pointer;
   transition:border-color .25s, background .25s, opacity .25s, box-shadow .25s}
 .node b{font-weight:600;font-size:.95rem;line-height:1.25}
 .node small{font-family:var(--mono);font-size:.7rem;color:var(--muted);line-height:1.35;display:flex;align-items:center;gap:6px}
 .node small i{flex:none;width:7px;height:7px;border-radius:50%;background:var(--mint)}
 .node:hover{border-color:var(--muted)}
 .node.dim{opacity:.5}
-.node.on{border-color:var(--accent);background:color-mix(in oklab, var(--accent) 9%, var(--surface))}
-.node.bad{border-color:var(--danger);background:color-mix(in oklab, var(--danger) 9%, var(--surface));opacity:1}
+.node.on{border-color:var(--accent);background:color-mix(in oklab, var(--accent) 14%, var(--glass-strong));box-shadow:inset 0 1px 0 var(--glass-hi), 0 0 28px -6px color-mix(in oklab, var(--accent) 70%, transparent)}
+.node.bad{border-color:var(--danger);background:color-mix(in oklab, var(--danger) 14%, var(--glass-strong));box-shadow:inset 0 1px 0 var(--glass-hi), 0 0 28px -6px color-mix(in oklab, var(--danger) 70%, transparent);opacity:1}
 .node.sel{box-shadow:0 0 0 4px color-mix(in oklab, var(--accent) 28%, transparent);opacity:1}
 
 .edge path{fill:none;stroke:var(--faint);stroke-width:1.6;transition:stroke .25s, opacity .25s}
@@ -122,7 +133,7 @@ button{font:inherit;color:inherit}
 .edge.on path{stroke:var(--accent);stroke-width:2.2}
 .edge.bad path{stroke:var(--danger);stroke-width:2.2;stroke-dasharray:6 5}
 .edge.hide{display:none}
-.edge .lb rect{fill:var(--surface)}
+.edge .lb rect{fill:var(--surface);fill-opacity:.88}
 .edge .lb text{fill:var(--muted);font-family:var(--mono);font-size:10.5px}
 .edge.on .lb text{fill:var(--accent)}
 .edge.bad .lb text{fill:var(--danger)}
@@ -132,15 +143,24 @@ button{font:inherit;color:inherit}
   .edge.bad path{animation:flow 1.6s linear infinite}
   @keyframes flow{to{stroke-dashoffset:-24}}
 }
-@media (max-width:700px){
-  .stage{column-gap:22px;row-gap:46px;padding:24px 16px}
-  .node{padding:10px 11px}
-  .node b{font-size:.88rem}
-  .edge .lb{display:none}
-}
+/* the stage picks its own layout from its width (see layout() in the script) */
+.stage.vertical{column-gap:clamp(28px,8vw,96px);row-gap:56px}
+.stage.compact{column-gap:22px;row-gap:46px;padding:24px 16px}
+.stage.compact .node{padding:10px 11px}
+.stage.compact .node b{font-size:.88rem}
+.stage.compact .edge .lb{display:none}
 
 /* control panel under the stage */
-.panel{display:grid;grid-template-columns:1fr;border-top:1px solid var(--line)}
+.panel{display:grid;grid-template-columns:1fr;border-top:1px solid var(--glass-edge);background:color-mix(in oklab, var(--bg) 30%, transparent)}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+  :root{--glass:color-mix(in oklab, var(--surface) 94%, transparent);--glass-strong:var(--surface)}
+}
+/* ---------- ambient light behind the glass ---------- */
+#aura{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:var(--aura-opacity)}
+.glow{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(60vw 45vh at 85% 75%, color-mix(in oklab, var(--accent) 16%, transparent), transparent 70%),
+             radial-gradient(45vw 40vh at 10% 15%, color-mix(in oklab, var(--accent) 8%, transparent), transparent 70%)}
+main,footer{position:relative;z-index:1}
 @media (min-width:860px){.panel{grid-template-columns:minmax(0,1fr) minmax(0,1.15fr)}}
 .panel > div{padding:20px 22px;min-width:0}
 @media (min-width:860px){.panel > div + div{border-left:1px solid var(--line)}}
@@ -206,6 +226,8 @@ footer{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;margin
   </div>
 </header>
 
+<div class="glow" aria-hidden="true"></div>
+<canvas id="aura" aria-hidden="true"></canvas>
 <main>
   <section class="intro">
     <div class="wrap">
@@ -252,6 +274,72 @@ footer{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;margin
   function onScroll(){bar.classList.toggle('scrolled',window.scrollY>8);}
   window.addEventListener('scroll',onScroll,{passive:true}); onScroll();
   document.getElementById('yr').textContent=new Date().getFullYear();
+
+
+  /* ---------- ambient light: bundles of thin streaks drifting behind the glass ---------- */
+  (function(){
+    var cv=document.getElementById('aura'); if(!cv||!cv.getContext) return;
+    var ctx=cv.getContext('2d'), still=matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var small=innerWidth<700, W=0,H=0,SCALE=small?0.35:0.5,FRAME=small?50:33,rgb=[255,106,61],raf=0,last=0;
+    var RIBBONS=[
+      {y:.78,slope:-.42,amp:.10,freq:1.6,speed:.00011,phase:0,threads:16,spread:.055,alpha:.5},
+      {y:.95,slope:-.55,amp:.08,freq:2.1,speed:.00008,phase:2.1,threads:12,spread:.04,alpha:.32},
+      {y:.30,slope:.18,amp:.06,freq:1.2,speed:.00006,phase:4.2,threads:9,spread:.035,alpha:.16}
+    ];
+    function readColour(){
+      var c=getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
+      var m=/^#([0-9a-f]{6})$/i.exec(c); if(m){var n=parseInt(m[1],16); rgb=[n>>16&255,n>>8&255,n&255];}
+    }
+    function resize(){W=cv.width=Math.max(1,Math.round(innerWidth*SCALE)); H=cv.height=Math.max(1,Math.round(innerHeight*SCALE));}
+    /* the light travels up at about a third of the scroll speed and bends as you scroll;
+       `smooth` eases toward the real scroll position so it flows instead of jumping */
+    var smooth=window.scrollY||0;
+    function bandY(r,u,t,ph,base,s){
+      return base + (u-.5)*r.slope*H*(1+.35*Math.sin(s*.0012+r.phase))
+        + Math.sin(u*Math.PI*r.freq + t*r.speed + ph + s*.0022)*r.amp*H*(.6+u*.6);
+    }
+    function draw(t){
+      ctx.clearRect(0,0,W,H);
+      ctx.globalCompositeOperation='lighter'; ctx.lineCap='round';
+      var s=smooth, P=1.35*H, travel=s*SCALE*.32, col='rgba('+rgb[0]+','+rgb[1]+','+rgb[2]+',';
+      RIBBONS.forEach(function(r){
+        var b0=((H*r.y-travel)%P+P)%P;
+        [b0-P,b0,b0+P].forEach(function(base){
+          if(base<-.7*H||base>1.7*H) return;
+          for(var k=0;k<r.threads;k++){
+            var f=k/(r.threads-1)-.5, off=f*r.spread*H, ph=r.phase+k*.09;
+            ctx.beginPath();
+            for(var i=0;i<=48;i++){
+              var u=i/48, x=(u*1.2-.1)*W, y=bandY(r,u,t,ph,base,s)+off*(.4+u);
+              if(i) ctx.lineTo(x,y); else ctx.moveTo(x,y);
+            }
+            var core=Math.abs(f)<.2;
+            ctx.strokeStyle=col+(r.alpha*(core?.55:.28))+')';
+            ctx.lineWidth=core?1.4:.9;
+            ctx.stroke();
+          }
+          ctx.beginPath();   /* soft glow under the threads */
+          for(var q=0;q<=48;q++){
+            var v=q/48, gx=(v*1.2-.1)*W, gy=bandY(r,v,t,r.phase,base,s);
+            if(q) ctx.lineTo(gx,gy); else ctx.moveTo(gx,gy);
+          }
+          ctx.strokeStyle=col+(r.alpha*.12)+')'; ctx.lineWidth=r.spread*H*1.6; ctx.stroke();
+        });
+      });
+    }
+    function loop(ts){
+      raf=requestAnimationFrame(loop);
+      if(ts-last<FRAME) return;   /* 20-30fps is plenty for slow light */
+      last=ts; smooth+=((window.scrollY||0)-smooth)*.14; draw(ts);
+    }
+    function start(){cancelAnimationFrame(raf); if(still||document.hidden){draw(0);} else raf=requestAnimationFrame(loop);}
+    readColour(); resize(); start();
+    addEventListener('resize',function(){resize(); draw(last);});
+    if(still) addEventListener('scroll',function(){smooth=window.scrollY||0; draw(0);},{passive:true});
+    document.addEventListener('visibilitychange',start);
+    new MutationObserver(function(){readColour(); draw(last);}).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+    matchMedia('(prefers-color-scheme: light)').addEventListener('change',function(){readColour(); draw(last);});
+  })();
 
   /* ---------- diagram data ----------
      nodes: c = column, r = row on desktop (transposed on phones); own = code I write
@@ -388,7 +476,6 @@ footer{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;margin
   var NS='http://www.w3.org/2000/svg';
   function sv(tag,attrs,parent){var e=document.createElementNS(NS,tag); for(var k in attrs) e.setAttribute(k,attrs[k]); if(parent) parent.appendChild(e); return e;}
   function h(tag,cls,html){var e=document.createElement(tag); if(cls) e.className=cls; if(html!=null) e.innerHTML=html; return e;}
-  var narrow=matchMedia('(max-width:700px)');
   var reduceMotion=matchMedia('(prefers-reduced-motion: reduce)').matches;
   var STEP_MS=4200;
   var ICON_PAUSE='<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>';
@@ -437,8 +524,11 @@ footer{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;margin
       edgeEls[E[0]+'>'+E[1]]={g:g,path:path,rect:rect,tx:tx,from:E[0],to:E[1],o:o,label:E[2]};
     });
 
+    /* go top-to-bottom whenever the side-by-side layout would squeeze the boxes below ~190px */
     function layout(){
-      var t=narrow.matches;
+      var sw=stage.clientWidth, need=S.cols*190+(S.cols-1)*56+80;
+      var t=sw<need, compact=sw<560;
+      stage.classList.toggle('vertical',t); stage.classList.toggle('compact',compact);
       var cols=t?S.rows:S.cols, rows=t?S.cols:S.rows;
       stage.style.gridTemplateColumns='repeat('+cols+',minmax(0,1fr))';
       stage.style.gridTemplateRows='repeat('+rows+',auto)';
@@ -459,15 +549,19 @@ footer{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;margin
         var e=edgeEls[k], A=R[e.from], B=R[e.to];
         var ca=[A.x+A.w/2,A.y+A.h/2], cb=[B.x+B.w/2,B.y+B.h/2], d, lx, ly;
         if(e.o.curve){
-          /* curve = lane: |1| clears the boxes on that side by 20px, |2| by 40px; sign picks the side, flipped if it would leave the stage */
+          /* curve = lane: the bulge clears the boxes by 20px (lane 1) or 40px (lane 2); the sign picks the side,
+             and the curve flips over if its real midpoint would land outside the diagram */
           var dx=cb[0]-ca[0], dy=cb[1]-ca[1], len=Math.hypot(dx,dy)||1, ux=-dy/len, uy=dx/len;
           var half=Math.abs(dx)>Math.abs(dy)?A.h/2:A.w/2;
-          var bend=2*(half+20*Math.abs(e.o.curve))*(e.o.curve<0?-1:1);
-          var mx=(ca[0]+cb[0])/2, my=(ca[1]+cb[1])/2;
-          var ax=mx+ux*bend/2, ay=my+uy*bend/2;
-          if(ax<8||ay<8||ax>sr.width-8||ay>sr.height-8) bend=-bend;
-          var cx=mx+ux*bend, cy=my+uy*bend;
-          var p1=exitPoint(A,cx,cy,2), p2=exitPoint(B,cx,cy,6);
+          var bend=(half+40*Math.abs(e.o.curve))*(e.o.curve<0?-1:1);
+          var mx=(ca[0]+cb[0])/2, my=(ca[1]+cb[1])/2, cx, cy, p1, p2;
+          for(var tries=0;tries<2;tries++){
+            cx=mx+ux*bend; cy=my+uy*bend;
+            p1=exitPoint(A,cx,cy,2); p2=exitPoint(B,cx,cy,6);
+            var axp=.25*p1[0]+.5*cx+.25*p2[0], ayp=.25*p1[1]+.5*cy+.25*p2[1];
+            if(axp>8&&ayp>8&&axp<sr.width-8&&ayp<sr.height-8) break;
+            bend=-bend;
+          }
           d='M'+p1[0].toFixed(1)+','+p1[1].toFixed(1)+' Q'+cx.toFixed(1)+','+cy.toFixed(1)+' '+p2[0].toFixed(1)+','+p2[1].toFixed(1);
           lx=.25*p1[0]+.5*cx+.25*p2[0]; ly=.25*p1[1]+.5*cy+.25*p2[1];
         }else{
@@ -479,6 +573,10 @@ footer{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;margin
         var lw=e.label.length*6.4+12;
         e.rect.setAttribute('x',(lx-lw/2).toFixed(1)); e.rect.setAttribute('y',(ly-9.5).toFixed(1)); e.rect.setAttribute('width',lw.toFixed(1));
         e.tx.setAttribute('x',lx.toFixed(1)); e.tx.setAttribute('y',(ly+3.8).toFixed(1));
+        /* hide a label that would sit on a box (happens when columns get close together) */
+        var lx0=lx-lw/2, lx1=lx+lw/2, ly0=ly-9.5, ly1=ly+9.5, hit=false;
+        Object.keys(R).forEach(function(id){var n=R[id]; if(lx0<n.x+n.w&&lx1>n.x&&ly0<n.y+n.h&&ly1>n.y) hit=true;});
+        e.g.querySelector('.lb').style.visibility=hit?'hidden':'';
       });
     }
 
@@ -562,17 +660,20 @@ footer{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;margin
       nodeEls[id].addEventListener('click',function(){state.node=(state.node===id)?null:id; paint();});
     });
     if('IntersectionObserver' in window){
-      new IntersectionObserver(function(es){es.forEach(function(en){auto.visible=en.isIntersecting; schedule();});},{threshold:.35}).observe(stage);
+      new IntersectionObserver(function(es){es.forEach(function(en){auto.visible=en.isIntersecting; schedule();});},{threshold:.15}).observe(viz);
     }else{auto.visible=true;}
 
     host.appendChild(sec);
     renderers.push(layout);
     layout(); paint();
-    if('ResizeObserver' in window) new ResizeObserver(function(){drawEdges();}).observe(stage);
+    if('ResizeObserver' in window){
+      var lastW=0;
+      new ResizeObserver(function(){ var w=stage.clientWidth; if(w!==lastW){lastW=w; layout();} else drawEdges(); }).observe(stage);
+    }
   });
 
   function relayoutAll(){renderers.forEach(function(f){f();});}
-  if(narrow.addEventListener) narrow.addEventListener('change',relayoutAll); else narrow.addListener(relayoutAll);
+  addEventListener('resize',relayoutAll);
   if(document.fonts&&document.fonts.ready) document.fonts.ready.then(relayoutAll);
 })();
 </script>
