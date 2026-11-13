@@ -151,12 +151,15 @@ button{font:inherit;color:inherit}
 .stage.compact .edge .lb{display:none}
 
 /* control panel under the stage */
-.panel{display:grid;grid-template-columns:1fr;border-top:1px solid var(--glass-edge);background:color-mix(in oklab, var(--bg) 30%, transparent)}
+.panel{display:grid;grid-template-columns:1fr;border-top:1px solid var(--glass-edge);background:color-mix(in oklab, var(--bg) 55%, transparent)}
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
   :root{--glass:color-mix(in oklab, var(--surface) 94%, transparent);--glass-strong:var(--surface)}
 }
 /* ---------- ambient light behind the glass ---------- */
 #aura{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:var(--aura-opacity)}
+@media (max-width:700px){#aura{opacity:calc(var(--aura-opacity) * .65)}}
+/* faint halo in the page colour keeps text readable where the light passes behind it */
+.intro h1,.intro .lede,.sys-head h2,.sys-head p,.outro h2{text-shadow:0 0 18px var(--bg),0 0 2px color-mix(in oklab, var(--bg) 70%, transparent)}
 .glow{position:fixed;inset:0;z-index:0;pointer-events:none;
   background:radial-gradient(60vw 45vh at 85% 75%, color-mix(in oklab, var(--accent) 16%, transparent), transparent 70%),
              radial-gradient(45vw 40vh at 10% 15%, color-mix(in oklab, var(--accent) 8%, transparent), transparent 70%)}
@@ -207,7 +210,17 @@ main,footer{position:relative;z-index:1}
 .btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
 footer{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-top:clamp(48px,6vw,72px);padding-top:22px;border-top:1px solid var(--line);font-family:var(--mono);font-size:.74rem;color:var(--faint)}
 @media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+/* ---------- smooth page change between the two pages (browsers without support just load normally) ---------- */
+@view-transition{navigation:auto}
+.bar{view-transition-name:topbar}
+/* whole-page transition (naming <main> instead would stop the glass panels from blurring the light behind them) */
+::view-transition-old(root){animation:vt-out .2s ease-in both}
+::view-transition-new(root){animation:vt-in .38s cubic-bezier(.2,.7,.2,1) both}
+@keyframes vt-out{to{opacity:0;transform:translateY(-10px)}}
+@keyframes vt-in{from{opacity:0;transform:translateY(14px)}}
+@media (prefers-reduced-motion:reduce){::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important}}
 </style>
+<script type="speculationrules">{"prerender":[{"where":{"href_matches":"*.html"},"eagerness":"moderate"}]}</script>
 </head>
 <body>
 
@@ -217,6 +230,7 @@ footer{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;margin
     <nav class="nav" aria-label="Pages">
       <a href="index.html#work" class="hide-sm">Work</a>
       <a href="index.html#experience" class="hide-sm">Experience</a>
+      <a href="index.html#stack" class="hide-sm">Stack</a>
       <a href="systems.html" aria-current="page">Systems</a>
       <a href="index.html#contact">Contact</a>
       <button class="theme-btn" id="themeBtn" type="button" aria-label="Switch colour theme">
@@ -281,51 +295,67 @@ footer{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;margin
     var cv=document.getElementById('aura'); if(!cv||!cv.getContext) return;
     var ctx=cv.getContext('2d'), still=matchMedia('(prefers-reduced-motion: reduce)').matches;
     var small=innerWidth<700, W=0,H=0,SCALE=small?0.35:0.5,FRAME=small?50:33,rgb=[255,106,61],raf=0,last=0;
+    /* twisted ribbons of light: strands cross over each other like silk, fade in and out at the ends,
+       and sit mostly to the right of the text column. x0/x1 = where the ribbon starts/ends (screen widths) */
     var RIBBONS=[
-      {y:.78,slope:-.42,amp:.10,freq:1.6,speed:.00011,phase:0,threads:16,spread:.055,alpha:.5},
-      {y:.95,slope:-.55,amp:.08,freq:2.1,speed:.00008,phase:2.1,threads:12,spread:.04,alpha:.32},
-      {y:.30,slope:.18,amp:.06,freq:1.2,speed:.00006,phase:4.2,threads:9,spread:.035,alpha:.16}
+      {y:.70,x0:.18,x1:1.12,slope:-.55,amp:.07,freq:1.3,speed:.00012,phase:0,  twist:1.7,width:.075,threads:26,alpha:.5},
+      {y:.18,x0:-.12,x1:.62,slope:.22,amp:.05,freq:1.1,speed:.00008,phase:2.6,twist:1.2,width:.04, threads:12,alpha:.22}
     ];
+    var glow=document.createElement('canvas'), gctx=glow.getContext('2d'), GLOW=8;
     function readColour(){
       var c=getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
       var m=/^#([0-9a-f]{6})$/i.exec(c); if(m){var n=parseInt(m[1],16); rgb=[n>>16&255,n>>8&255,n&255];}
     }
-    function resize(){W=cv.width=Math.max(1,Math.round(innerWidth*SCALE)); H=cv.height=Math.max(1,Math.round(innerHeight*SCALE));}
+    function resize(){
+      W=cv.width=Math.max(1,Math.round(innerWidth*SCALE)); H=cv.height=Math.max(1,Math.round(innerHeight*SCALE));
+      glow.width=Math.max(1,Math.round(W/GLOW)); glow.height=Math.max(1,Math.round(H/GLOW));
+    }
     /* the light travels up at about a third of the scroll speed and bends as you scroll;
        `smooth` eases toward the real scroll position so it flows instead of jumping */
     var smooth=window.scrollY||0;
-    function bandY(r,u,t,ph,base,s){
-      return base + (u-.5)*r.slope*H*(1+.35*Math.sin(s*.0012+r.phase))
-        + Math.sin(u*Math.PI*r.freq + t*r.speed + ph + s*.0022)*r.amp*H*(.6+u*.6);
+    function centre(r,u,t,base,s){
+      return base + (u-.5)*r.slope*Math.min(H,W*.75)*(1+.3*Math.sin(s*.0012+r.phase))
+        + Math.sin(u*Math.PI*r.freq + t*r.speed + r.phase + s*.0022)*r.amp*H;
+    }
+    function fade(c,x0,x1,a){   /* horizontal fade so the ribbon has soft ends instead of hard edges */
+      var g=c.createLinearGradient(x0,0,x1,0), col='rgba('+rgb[0]+','+rgb[1]+','+rgb[2]+',';
+      g.addColorStop(0,col+'0)'); g.addColorStop(.28,col+a+')'); g.addColorStop(.72,col+a+')'); g.addColorStop(1,col+'0)');
+      return g;
     }
     function draw(t){
-      ctx.clearRect(0,0,W,H);
+      ctx.clearRect(0,0,W,H); gctx.clearRect(0,0,glow.width,glow.height);
       ctx.globalCompositeOperation='lighter'; ctx.lineCap='round';
-      var s=smooth, P=1.35*H, travel=s*SCALE*.32, col='rgba('+rgb[0]+','+rgb[1]+','+rgb[2]+',';
+      var s=smooth, P=1.4*H, travel=s*SCALE*.32, N=56;
       RIBBONS.forEach(function(r){
-        var b0=((H*r.y-travel)%P+P)%P;
+        var X0=r.x0*W, X1=r.x1*W, b0=((H*r.y-travel)%P+P)%P;
         [b0-P,b0,b0+P].forEach(function(base){
           if(base<-.7*H||base>1.7*H) return;
+          /* glow: thick soft stroke drawn small, then scaled up, which blurs it for free */
+          gctx.save(); gctx.scale(1/GLOW,1/GLOW); gctx.lineCap='round';
+          gctx.strokeStyle=fade(gctx,X0,X1,r.alpha*.55); gctx.lineWidth=r.width*H*2.2;
+          gctx.beginPath();
+          for(var q=0;q<=N;q++){var v=q/N, gx=X0+(X1-X0)*v, gy=centre(r,v,t,base,s); if(q) gctx.lineTo(gx,gy); else gctx.moveTo(gx,gy);}
+          gctx.stroke(); gctx.restore();
+          /* strands: each one swings across the ribbon width, so they cross and bunch up like twisted silk */
+          ctx.strokeStyle=fade(ctx,X0,X1,1);
           for(var k=0;k<r.threads;k++){
-            var f=k/(r.threads-1)-.5, off=f*r.spread*H, ph=r.phase+k*.09;
+            var f=k/(r.threads-1)-.5, ph=f*2.4;
             ctx.beginPath();
-            for(var i=0;i<=48;i++){
-              var u=i/48, x=(u*1.2-.1)*W, y=bandY(r,u,t,ph,base,s)+off*(.4+u);
+            for(var i=0;i<=N;i++){
+              var u=i/N, x=X0+(X1-X0)*u;
+              var y=centre(r,u,t,base,s) + r.width*H*f*Math.cos(u*Math.PI*r.twist + t*r.speed*1.6 + ph + s*.0016);
               if(i) ctx.lineTo(x,y); else ctx.moveTo(x,y);
             }
-            var core=Math.abs(f)<.2;
-            ctx.strokeStyle=col+(r.alpha*(core?.55:.28))+')';
-            ctx.lineWidth=core?1.4:.9;
+            ctx.globalAlpha=r.alpha*(Math.abs(f)<.15?.75:.32);
+            ctx.lineWidth=Math.abs(f)<.15?1.3:.8;
             ctx.stroke();
           }
-          ctx.beginPath();   /* soft glow under the threads */
-          for(var q=0;q<=48;q++){
-            var v=q/48, gx=(v*1.2-.1)*W, gy=bandY(r,v,t,r.phase,base,s);
-            if(q) ctx.lineTo(gx,gy); else ctx.moveTo(gx,gy);
-          }
-          ctx.strokeStyle=col+(r.alpha*.12)+')'; ctx.lineWidth=r.spread*H*1.6; ctx.stroke();
+          ctx.globalAlpha=1;
         });
       });
+      ctx.imageSmoothingEnabled=true; ctx.globalAlpha=.7;
+      ctx.drawImage(glow,0,0,W,H);
+      ctx.globalAlpha=1;
     }
     function loop(ts){
       raf=requestAnimationFrame(loop);
